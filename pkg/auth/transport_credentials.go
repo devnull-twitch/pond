@@ -66,9 +66,12 @@ func (auth *pondJwtTC) ClientHandshake(
 	if err != nil {
 		return conn, nil, fmt.Errorf("unable to write token length")
 	}
-	conn.Write(tokenBytes)
-	if err != nil {
-		return conn, nil, fmt.Errorf("unable to write token")
+
+	if len(tokenBytes) > 0 {
+		conn.Write(tokenBytes)
+		if err != nil {
+			return conn, nil, fmt.Errorf("unable to write token")
+		}
 	}
 
 	resBuf := make([]byte, 1)
@@ -90,6 +93,13 @@ func (auth *pondJwtTC) ServerHandshake(conn net.Conn) (net.Conn, credentials.Aut
 
 	// also allow non authed calls
 	if tokenLength == 0 {
+		// still send ACK on 0 length token
+		_, err = conn.Write([]byte{1})
+		if err != nil {
+			return conn, nil, fmt.Errorf("unable to send ACK")
+		}
+
+		fmt.Println("empty but success")
 		return conn, nil, nil
 	}
 
@@ -112,7 +122,11 @@ func (auth *pondJwtTC) ServerHandshake(conn net.Conn) (net.Conn, credentials.Aut
 		return conn, nil, fmt.Errorf("unable to validate token")
 	}
 
-	conn.Write([]byte{1})
+	_, err = conn.Write([]byte{1})
+	if err != nil {
+		return conn, nil, fmt.Errorf("unable to send ACK")
+	}
+
 	fmt.Println("success")
 
 	return conn, &jwtAuthType{claims}, nil
