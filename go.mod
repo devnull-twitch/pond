@@ -2,10 +2,8 @@ module github.com/devnull-twitch/pond
 
 go 1.18
 
-replace github.com/devnull-twitch/pond-com => ../pond-com
-
 require (
-	github.com/devnull-twitch/pond-com v0.0.0-20220401221512-36068cd33044
+	github.com/devnull-twitch/pond-com v0.0.0-20220409141543-cc7d6a6ddfe6
 	github.com/golang-jwt/jwt/v4 v4.3.0
 	github.com/joho/godotenv v1.4.0
 	google.golang.org/grpc v1.45.0
